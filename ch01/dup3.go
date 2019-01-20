@@ -11,6 +11,7 @@ import (
 
 func main() {
 	counts := make(map[string]int)
+	files := make(map[string]string)
 	for _, filename := range os.Args[1:] {
 		data, err := ioutil.ReadFile(filename)
 		if err != nil {
@@ -19,11 +20,18 @@ func main() {
 		}
 		for _, line := range strings.Split(string(data), "\n") {
 			counts[line]++
+			if val, ok := files[line]; ok {
+				if !strings.Contains(files[line], filename) {
+					files[line] = val + ", " + filename
+				}
+			} else {
+				files[line] = filename
+			}
 		}
 	}
 	for line, n := range counts {
 		if n > 1 {
-			fmt.Printf("%d\t%s\n", n, line)
+			fmt.Printf("%d\t%s\t%s\t%s\n", n, files[line], line)
 		}
 	}
 }
